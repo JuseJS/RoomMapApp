@@ -1,4 +1,4 @@
-package org.iesharia.roommapapp.ui.theme
+package org.iesharia.roommapapp.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
