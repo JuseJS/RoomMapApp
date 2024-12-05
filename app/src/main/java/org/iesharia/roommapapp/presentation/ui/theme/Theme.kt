@@ -1,6 +1,5 @@
-package org.iesharia.roommapapp.ui.theme
+package org.iesharia.roommapapp.presentation.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
