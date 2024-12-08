@@ -1,4 +1,4 @@
-package org.iesharia.roommapapp.data.database.dao
+package org.iesharia.roommapapp.data.database.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
