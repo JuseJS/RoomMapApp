@@ -14,6 +14,9 @@ class CustomMapRepository @Inject constructor(
 
     suspend fun getDefaultMap(): CustomMap? = customMapDao.getDefaultMap()
 
+    suspend fun getCustomMapById(mapId: Long): CustomMap? =
+        customMapDao.getCustomMapById(mapId)
+
     suspend fun insertCustomMap(customMap: CustomMap) =
         customMapDao.insertCustomMap(customMap)
 

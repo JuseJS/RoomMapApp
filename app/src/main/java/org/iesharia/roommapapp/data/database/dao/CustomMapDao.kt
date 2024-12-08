@@ -36,7 +36,8 @@ interface CustomMapDao {
     @Transaction
     suspend fun setDefaultMap(mapId: Long) {
         clearDefaultMap()
-        updateCustomMap(getCustomMapById(mapId)?.copy(isDefault = true)
-            ?: throw IllegalArgumentException("Map not found"))
+        getCustomMapById(mapId)?.let { map ->
+            updateCustomMap(map.copy(isDefault = true))
+        }
     }
 }
