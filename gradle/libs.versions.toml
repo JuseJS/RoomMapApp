@@ -1,4 +1,5 @@
 [versions]
+accompanistSystemuicontroller = "0.32.0"
 agp = "8.7.3"
 kotlin = "2.1.0"
 coreKtx = "1.15.0"
@@ -16,9 +17,12 @@ navigation = "2.8.4"
 osmdroid = "6.1.18"
 hilt = "2.53"
 hiltNavigation = "1.2.0"
+materialIconsCore = "1.7.5"
+materialIconsExtended = "1.7.5"
 
 [libraries]
 # Android Core
+accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontroller" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 
 # Room (Database)
@@ -47,6 +51,10 @@ osmdroid-android = { group = "org.osmdroid", name = "osmdroid-android", version.
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigation" }
+
+# Iconos
+androidx-compose-material-icons-core = { group = "androidx.compose.material", name = "material-icons-core", version.ref = "materialIconsCore" }
+androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "materialIconsExtended" }
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }
