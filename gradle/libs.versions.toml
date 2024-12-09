@@ -1,4 +1,5 @@
 [versions]
+accompanistSystemuicontroller = "0.32.0"
 agp = "8.7.3"
 kotlin = "2.1.0"
 coreKtx = "1.15.0"
@@ -19,6 +20,7 @@ hiltNavigation = "1.2.0"
 
 [libraries]
 # Android Core
+accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontroller" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 
 # Room (Database)
