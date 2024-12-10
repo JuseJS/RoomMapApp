@@ -2,6 +2,7 @@ package org.iesharia.roommapapp.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.RoomDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -11,6 +12,7 @@ import org.iesharia.roommapapp.data.database.AppDatabase
 import org.iesharia.roommapapp.data.database.dao.CustomMapDao
 import org.iesharia.roommapapp.data.database.dao.MarkerDao
 import org.iesharia.roommapapp.data.database.dao.MarkerTypeDao
+import org.iesharia.roommapapp.domain.util.Constants
 import javax.inject.Singleton
 
 @Module
@@ -25,8 +27,11 @@ object DatabaseModule {
         return Room.databaseBuilder(
             context,
             AppDatabase::class.java,
-            "app_database"
-        ).build()
+            Constants.Database.DATABASE_NAME
+        )
+            .enableMultiInstanceInvalidation()
+            .setJournalMode(RoomDatabase.JournalMode.WRITE_AHEAD_LOGGING)
+            .build()
     }
 
     @Provides
