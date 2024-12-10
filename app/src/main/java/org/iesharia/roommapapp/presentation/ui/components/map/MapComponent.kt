@@ -1,9 +1,6 @@
 package org.iesharia.roommapapp.presentation.ui.components.map
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -11,7 +8,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import org.iesharia.roommapapp.domain.model.MarkerModel
-import org.iesharia.roommapapp.domain.util.Constants
+import org.osmdroid.util.GeoPoint
 
 @Composable
 fun MapComponent(
@@ -23,29 +20,37 @@ fun MapComponent(
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    val mapView = remember {
+    // Inicializar OSMDroid
+    DisposableEffect(Unit) {
         MapConfiguration.initialize(context)
-        MapConfiguration.createMapView(context, MapConfig(
-            initialLatitude = Constants.Map.DEFAULT_LATITUDE,
-            initialLongitude = Constants.Map.DEFAULT_LONGITUDE,
-            initialZoom = Constants.Map.DEFAULT_ZOOM
-        ))
-
-
+        onDispose { }
     }
 
-    val mapController = remember {
+    // Crear y configurar el MapView
+    val mapView = remember(config.isDarkTheme) {
+        MapConfiguration.createMapView(context, config)
+    }
+
+    val mapController = remember(mapView) {
         MapControllerCompose(context, mapView)
     }
 
+    // Manejar los marcadores
     LaunchedEffect(markers) {
         mapController.updateMarkers(markers)
     }
 
+    // Gestionar el ciclo de vida
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
-                Lifecycle.Event.ON_RESUME -> mapView.onResume()
+                Lifecycle.Event.ON_RESUME -> {
+                    mapView.onResume()
+                    mapView.controller.apply {
+                        setCenter(GeoPoint(config.initialLatitude, config.initialLongitude))
+                        setZoom(config.initialZoom)
+                    }
+                }
                 Lifecycle.Event.ON_PAUSE -> mapView.onPause()
                 else -> {}
             }
@@ -59,10 +64,17 @@ fun MapComponent(
         }
     }
 
-    AndroidView(
-        factory = { mapView },
-        modifier = modifier
-    )
+    key(config.isDarkTheme) {
+        AndroidView(
+            factory = { mapView },
+            modifier = modifier,
+            update = { view ->
+                view.controller.setCenter(GeoPoint(config.initialLatitude, config.initialLongitude))
+                view.controller.setZoom(config.initialZoom)
+            }
+        )
+    }
 
+    // Mostrar ventana de información de marcador
     mapController.MarkerInfoWindow()
 }
