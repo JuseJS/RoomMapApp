@@ -11,6 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -23,7 +24,7 @@ import org.iesharia.roommapapp.presentation.ui.components.common.ErrorDialog
 import org.iesharia.roommapapp.presentation.ui.components.common.LoadingIndicator
 import org.iesharia.roommapapp.presentation.ui.components.map.MapComponent
 import org.iesharia.roommapapp.presentation.ui.components.map.MapConfig
-import org.iesharia.roommapapp.presentation.ui.components.MapStyleDrawer
+import org.iesharia.roommapapp.presentation.ui.components.MarkerDrawer
 import org.iesharia.roommapapp.presentation.ui.components.MapTopAppBar
 import org.iesharia.roommapapp.presentation.ui.components.map.MarkerInfoDialog
 import org.iesharia.roommapapp.presentation.viewmodel.MapViewModel
@@ -41,13 +42,15 @@ fun MainScreen(
     // Extraer contenido del drawer como función @Composable
     @Composable
     fun DrawerContent() {
-        MapStyleDrawer(
+        val scope = rememberCoroutineScope()
+        MarkerDrawer(
             drawerState = drawerState,
-            availableMaps = uiState.availableMaps,
-            currentMapId = uiState.currentMap?.id,
-            onMapSelected = { mapId ->
+            availibleMarkers = uiState.markers,
+            onNavigateToMarker = { lat, lon ->
+                // Actualizar la posición del mapa
+                mapViewModel.updateMapPosition(lat, lon)
+                // Cerrar el drawer
                 scope.launch {
-                    mapViewModel.handleEvent(MapEvent.OnMapSelected(mapId))
                     drawerState.close()
                 }
             }
@@ -81,21 +84,24 @@ fun MainScreen(
                     )
                 }
 
-                MapComponent(
-                    modifier = Modifier.fillMaxSize(),
-                    config = MapConfig(
-                        initialLatitude = uiState.currentMap?.initialLatitude
-                            ?: Constants.Map.DEFAULT_LATITUDE,
-                        initialLongitude = uiState.currentMap?.initialLongitude
-                            ?: Constants.Map.DEFAULT_LONGITUDE,
-                        initialZoom = uiState.currentMap?.initialZoom?.toDouble()
-                            ?: Constants.Map.DEFAULT_ZOOM
-                    ),
-                    markers = uiState.markers,
-                    onMarkerClick = { marker ->
-                        mapViewModel.handleEvent(MapEvent.OnMarkerSelected(marker))
-                    }
-                )
+                key(isDarkTheme) { // Uso del key como scope function
+                    MapComponent(
+                        modifier = Modifier.fillMaxSize(),
+                        config = MapConfig(
+                            initialLatitude = uiState.currentMap?.initialLatitude
+                                ?: Constants.Map.DEFAULT_LATITUDE,
+                            initialLongitude = uiState.currentMap?.initialLongitude
+                                ?: Constants.Map.DEFAULT_LONGITUDE,
+                            initialZoom = uiState.currentMap?.initialZoom?.toDouble()
+                                ?: Constants.Map.DEFAULT_ZOOM,
+                            isDarkTheme = isDarkTheme
+                        ),
+                        markers = uiState.markers,
+                        onMarkerClick = { marker ->
+                            mapViewModel.handleEvent(MapEvent.OnMarkerSelected(marker))
+                        }
+                    )
+                }
 
                 if (uiState.isLoading) {
                     LoadingIndicator()
