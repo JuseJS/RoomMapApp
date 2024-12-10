@@ -3,6 +3,7 @@ package org.iesharia.roommapapp.domain.usecase.custommap
 import org.iesharia.roommapapp.domain.model.CustomMapModel
 import org.iesharia.roommapapp.domain.repository.CustomMapRepository
 import org.iesharia.roommapapp.domain.util.Result
+import org.iesharia.roommapapp.domain.util.toAppError
 import javax.inject.Inject
 
 class AddDefaultMapUseCase @Inject constructor(
@@ -10,7 +11,6 @@ class AddDefaultMapUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(): Result<CustomMapModel> {
         return try {
-            // Coordenadas de Haría, Lanzarote
             val defaultMap = CustomMapModel(
                 id = 0L,
                 name = "Haría, Lanzarote",
@@ -21,11 +21,19 @@ class AddDefaultMapUseCase @Inject constructor(
                 isDefault = true
             )
 
-            repository.addCustomMap(defaultMap)
-            repository.setDefaultMap(defaultMap.id)
-            Result.Success(defaultMap)
+            when (val addResult = repository.addCustomMap(defaultMap)) {
+                is Result.Success -> {
+                    when (val setDefaultResult = repository.setDefaultMap(defaultMap.id)) {
+                        is Result.Success -> Result.Success(defaultMap)
+                        is Result.Error -> setDefaultResult
+                        Result.Loading -> Result.Loading
+                    }
+                }
+                is Result.Error -> addResult
+                Result.Loading -> Result.Loading
+            }
         } catch (e: Exception) {
-            Result.Error(e)
+            Result.Error(e.toAppError())
         }
     }
 }
