@@ -10,21 +10,28 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import org.iesharia.roommapapp.domain.model.MarkerData
+import org.iesharia.roommapapp.domain.model.MarkerModel
+import org.iesharia.roommapapp.domain.util.Constants
 
 @Composable
 fun MapComponent(
     modifier: Modifier = Modifier,
-    config: MapConfig = MapConfig(),
-    markers: List<MarkerData> = emptyList(),
-    onMarkerClick: (MarkerData) -> Unit = {}
+    config: MapConfig,
+    markers: List<MarkerModel> = emptyList(),
+    onMarkerClick: (MarkerModel) -> Unit = {}
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
     val mapView = remember {
         MapConfiguration.initialize(context)
-        MapConfiguration.createMapView(context, config)
+        MapConfiguration.createMapView(context, MapConfig(
+            initialLatitude = Constants.Map.DEFAULT_LATITUDE,
+            initialLongitude = Constants.Map.DEFAULT_LONGITUDE,
+            initialZoom = Constants.Map.DEFAULT_ZOOM
+        ))
+
+
     }
 
     val mapController = remember {
