@@ -48,4 +48,14 @@ object DatabaseModule {
     fun provideCustomMapDao(database: AppDatabase): CustomMapDao {
         return database.customMapDao()
     }
+
+    @Provides
+    @Singleton
+    fun provideDeleteDatabaseFunction(
+        @ApplicationContext context: Context
+    ): () -> Unit {
+        return {
+            context.deleteDatabase(Constants.Database.DATABASE_NAME)
+        }
+    }
 }

@@ -5,15 +5,47 @@ import org.iesharia.roommapapp.domain.model.MarkerTypeModel
 import org.iesharia.roommapapp.domain.repository.MarkerRepository
 import org.iesharia.roommapapp.domain.repository.MarkerTypeRepository
 import org.iesharia.roommapapp.domain.model.MapIconType
+import org.iesharia.roommapapp.domain.util.AppError
+import org.iesharia.roommapapp.domain.util.Result
+import org.iesharia.roommapapp.domain.util.toAppError
 import javax.inject.Inject
 
 class InitializeDataUseCase @Inject constructor(
     private val markerRepository: MarkerRepository,
     private val markerTypeRepository: MarkerTypeRepository
 ) {
-    suspend operator fun invoke(mapId: Long) {
-        // Inicializar tipos de marcadores
-        val markerTypes = listOf(
+    suspend operator fun invoke(mapId: Long): Result<Unit> {
+        return try {
+            if (mapId <= 0) {
+                throw AppError.ValidationError("ID de mapa inválido")
+            }
+
+            // Inicializar tipos de marcadores
+            val markerTypes = createMarkerTypes()
+            markerTypes.forEach { markerType ->
+                when (val result = markerTypeRepository.addMarkerType(markerType)) {
+                    is Result.Error -> throw result.error
+                    else -> { /* Continuar */ }
+                }
+            }
+
+            // Inicializar marcadores
+            val markers = createMarkers(mapId, markerTypes)
+            markers.forEach { marker ->
+                when (val result = markerRepository.addMarker(marker)) {
+                    is Result.Error -> throw result.error
+                    else -> { /* Continuar */ }
+                }
+            }
+
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(e.toAppError())
+        }
+    }
+
+    private fun createMarkerTypes(): List<MarkerTypeModel> {
+        return listOf(
             MarkerTypeModel(
                 id = 1,
                 name = "Restaurante",
@@ -47,35 +79,30 @@ class InitializeDataUseCase @Inject constructor(
                 isVisible = true
             )
         )
+    }
 
-        // Insertar tipos de marcadores
-        markerTypes.forEach { markerTypeRepository.addMarkerType(it) }
-
-        // Crear marcadores de ejemplo
-        val markers = listOf(
+    private fun createMarkers(mapId: Long, types: List<MarkerTypeModel>): List<MarkerModel> {
+        return listOf(
             // Restaurantes
-            createMarker("Casa Lucio", markerTypes[0], mapId, 40.4128, -3.7075, "Restaurante tradicional madrileño"),
-            createMarker("Botín", markerTypes[0], mapId, 40.4156, -3.7089, "Restaurante más antiguo del mundo"),
-            createMarker("La Barraca", markerTypes[0], mapId, 40.4176, -3.7048, "Especialidad en paella"),
+            createMarker("El Diablo", types[0], mapId, 29.0117, -13.7357, "Restaurante icónico en el Parque Nacional de Timanfaya, con platos cocinados con calor volcánico"),
+            createMarker("La Casa Roja", types[0], mapId, 28.9182, -13.7086, "Restaurante frente al puerto en Marina Rubicón con especialidades locales"),
+            createMarker("Casa Brigida", types[0], mapId, 28.8638, -13.8225, "Deliciosa cocina canaria en el pueblo de Yaiza"),
 
             // Hoteles
-            createMarker("Hotel Ritz", markerTypes[1], mapId, 40.4156, -3.6922, "Hotel de lujo histórico"),
-            createMarker("Hotel Palace", markerTypes[1], mapId, 40.4147, -3.6947, "Hotel emblemático"),
-            createMarker("Hotel Ópera", markerTypes[1], mapId, 40.4183, -3.7089, "Hotel céntrico"),
+            createMarker("Hotel Fariones", types[1], mapId, 28.9215, -13.6650, "Lujo y confort cerca de la playa en Puerto del Carmen"),
+            createMarker("Hotel Princesa Yaiza", types[1], mapId, 28.8677, -13.8225, "Hotel de lujo frente al mar en Playa Blanca"),
+            createMarker("Hotel La Geria", types[1], mapId, 28.9253, -13.6587, "Hotel cerca de la playa con excelente gastronomía"),
 
             // Monumentos
-            createMarker("Palacio Real", markerTypes[2], mapId, 40.4180, -3.7144, "Residencia oficial de la Corona"),
-            createMarker("Plaza Mayor", markerTypes[2], mapId, 40.4155, -3.7074, "Plaza histórica principal"),
-            createMarker("Puerta del Sol", markerTypes[2], mapId, 40.4169, -3.7034, "Centro neurálgico de Madrid"),
+            createMarker("Monumento al Campesino", types[2], mapId, 29.0005, -13.6169, "Obra icónica de César Manrique en homenaje a los campesinos de Lanzarote"),
+            createMarker("Castillo de San José", types[2], mapId, 28.9659, -13.5359, "Museo Internacional de Arte Contemporáneo"),
+            createMarker("Jardín de Cactus", types[2], mapId, 29.0915, -13.4810, "Espectacular jardín diseñado por César Manrique"),
 
             // Parques
-            createMarker("Retiro", markerTypes[3], mapId, 40.4153, -3.6844, "Parque principal de Madrid"),
-            createMarker("Casa de Campo", markerTypes[3], mapId, 40.4115, -3.7473, "Mayor pulmón verde de Madrid"),
-            createMarker("Madrid Río", markerTypes[3], mapId, 40.4097, -3.7199, "Parque lineal junto al río")
+            createMarker("Parque Nacional de Timanfaya", types[3], mapId, 28.9983, -13.7922, "Parque volcánico único en el mundo"),
+            createMarker("Cueva de los Verdes", types[3], mapId, 29.1570, -13.4316, "Sistema de túneles volcánicos impresionante"),
+            createMarker("Los Jameos del Agua", types[3], mapId, 29.1574, -13.4320, "Espacio natural transformado por César Manrique con cuevas y piscinas"),
         )
-
-        // Insertar marcadores
-        markers.forEach { markerRepository.addMarker(it) }
     }
 
     private fun createMarker(

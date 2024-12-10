@@ -10,12 +10,12 @@ object Constants {
         const val DEFAULT_LONGITUDE = -13.497764 // Haría, Lanzarote
 
         // Tile Cache
-        const val CACHE_SIZE_MB = 100
-        const val CACHE_TRIM_SIZE_MB = 80
+        const val CACHE_SIZE_MB = 100  // Tamaño máximo de la caché en MB
+        const val CACHE_TRIM_SIZE_MB = 80  // Tamaño al que se reduce la caché cuando se excede el máximo
 
         // Map Update Intervals
-        const val LOCATION_UPDATE_INTERVAL = 5000L // 5 seconds
-        const val MARKER_UPDATE_THRESHOLD = 1000L // 1 second
+        const val LOCATION_UPDATE_INTERVAL = 5000L // 5 segundos
+        const val MARKER_UPDATE_THRESHOLD = 1000L // 1 segundo
     }
 
     // Database
