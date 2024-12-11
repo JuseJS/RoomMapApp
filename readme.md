@@ -14,12 +14,12 @@ Aplicación Android desarrollada como parte del proyecto de Programación Multim
 ## Capturas de Pantalla
 
 ### Pantalla Principal
-[Añadir captura de pantalla del mapa principal]
+![Página de Inicio](images/home_page.png "Vistal Principal")
 
 *Descripción: Vista principal de la aplicación mostrando el mapa con marcadores.*
 
 ### Menú de Marcadores
-[Añadir captura de pantalla del menú lateral]
+![Página de Inicio](images/marker_drawer.png "Menu de Marcadores")
 
 *Descripción: Menú lateral mostrando los diferentes tipos de marcadores disponibles.*
 
